@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold tracking-tight mb-2"> <span style="color: #eb0000">Digital Hub</span> Time
+                Tracker</h1>
+            <p class="text-gray-600">Track your work time efficiently!</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="grid gap-8 md:grid-cols-3">
+            <!-- Timer Section -->
+            <div class="md:col-span-2 space-y-6">
+                <!-- New Timer Button -->
+                <button id="newTimerBtn"
+                    class="w-full bg-black text-white py-3 px-4 rounded-lg flex items-center justify-center hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-plus rotate-icon mr-2"></i>
+                    Start New Timer
+                </button>
+
+                <!-- Active Timers List -->
+                <div id="activeTimers" class="space-y-4"></div>
+
+                <!-- History Section -->
+                <div class="bg-white rounded-lg shadow p-6 mt-8">
+                    <h2 class="text-xl font-semibold mb-4">Time History</h2>
+                    <div class="overflow-x-auto">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Project</th>
+                                    <th class="text-left">Description</th>
+                                    <th class="text-left">Type</th>
+                                    <th class="text-left">Duration</th>
+                                    <th class="text-left">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Projects</h2>
+                    <div id="projectsList" class="space-y-3"></div>
+
+                    <!-- Add Project Button -->
+                    <button id="addProjectBtn"
+                        class="mt-4 w-full bg-gray-100 text-gray-800 py-2 px-4 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Timer Modal -->
+    <div id="newTimerModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-6">Start New Timer</h2>
+            <form id="newTimerForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                    <select id="projectSelect" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Select a project...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input type="text" id="description" class="w-full border rounded-lg px-3 py-2"
+                        placeholder="What are you working on?" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select id="taskType" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Select type...</option>
+                        <option value="bug-fix">Bug Fix</option>
+                        <option value="feature">Feature</option>
+                        <option value="enhancement">Enhancement</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="documentation">Documentation</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button"
+                        class="cancel-modal px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button type="submit" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">Start
+                        Timer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div id="addProjectModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-6">Add New Project</h2>
+            <form id="addProjectForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+                    <input type="text" id="projectName" class="w-full border rounded-lg px-3 py-2"
+                        placeholder="Enter project name" required>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button"
+                        class="cancel-modal px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button type="submit" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">Add
+                        Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Custom Alert -->
+    <div id="customAlert" class="alert-overlay">
+        <div class="alert-box">
+            <div id="alertIcon" class="alert-icon">
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
+            </div>
+            <h3 id="alertTitle" class="text-xl font-bold mb-4"></h3>
+            <p id="alertMessage" class="text-gray-600 mb-6"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="alertCancel" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                    Cancel
+                </button>
+                <button id="alertConfirm" class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Entry Modal -->
+    <div id="editEntryModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-6">Edit Time Entry</h2>
+            <form id="editEntryForm" class="space-y-4">
+                <input type="hidden" id="editEntryId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                    <select id="editProjectSelect" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="">Select a project...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input type="text" id="editDescription" class="w-full border rounded-lg px-3 py-2" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select id="editTaskType" class="w-full border rounded-lg px-3 py-2" required>
+                        <option value="bug-fix">Bug Fix</option>
+                        <option value="feature">Feature</option>
+                        <option value="enhancement">Enhancement</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="documentation">Documentation</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button"
+                        class="cancel-modal px-4 py-2 text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button type="submit" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">Save
+                        Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./app.js"></script>
+</body>
+
+</html>
