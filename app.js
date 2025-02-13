@@ -345,6 +345,7 @@ document.querySelectorAll('.cancel-modal').forEach(btn => {
     btn.addEventListener('click', () => {
         newTimerModal.classList.remove('active');
         addProjectModal.classList.remove('active');
+        editEntryModal.classList.remove('active');
     });
 });
 
